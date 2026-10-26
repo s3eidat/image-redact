@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' data: blob:; connect-src 'self' data: blob:; worker-src 'self' blob:; manifest-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Image Redact — Black Out Private Info in Screenshots | S3eidat Tools</title>
+<meta name="description" content="Hide names, emails, numbers and faces in screenshots and photos. Solid boxes, freehand, pixelate or blur, then export a new full-resolution PNG or JPG where the hidden pixels are really gone. Free, private, nothing uploaded.">
+<meta property="og:title" content="Image Redact — hide private info in screenshots, for real">
+<meta property="og:description" content="Black out or pixelate parts of an image and export a clean copy. Runs 100% in your browser.">
+<link rel="icon" href="kit/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit/kit.css">
+<link rel="stylesheet" href="app.css">
+<script src="kit/kit.js"></script>
+<!--s3:seo-->
+<link rel="canonical" href="https://s3eidat.github.io/image-redact/">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0d0f12">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="S3eidat Tools">
+<meta property="og:url" content="https://s3eidat.github.io/image-redact/">
+<meta property="og:image" content="https://s3eidat.github.io/image-redact/screenshot.png">
+<meta property="og:image:width" content="1280"><meta property="og:image:height" content="800">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Image Redact — Hide private info in screenshots for real">
+<meta name="twitter:description" content="Hide private info in screenshots for real. Free, private and runs 100% in your browser: no sign-up, no uploads.">
+<meta name="twitter:image" content="https://s3eidat.github.io/image-redact/screenshot.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Image Redact", "url": "https://s3eidat.github.io/image-redact/", "description": "Hide private info in screenshots for real. Free, private and runs 100% in your browser: no sign-up, no uploads.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any (web browser)", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "image": "https://s3eidat.github.io/image-redact/screenshot.png", "author": {"@type": "Person", "name": "s3eidat", "url": "https://github.com/s3eidat"}}</script>
+<!--/s3:seo-->
+</head>
+<body data-tool="image-redact">
+<main class="s3-main">
+  <section class="s3-hero">
+    <h1>Image Redact</h1>
+    <p>Cover names, emails, card numbers or faces in a screenshot, then save a brand-new image. The covered pixels are replaced in the exported file, not just hidden on top. Paste a screenshot (Ctrl+V) or drop an image; it never leaves your browser.</p>
+  </section>
+
+  <section class="card stack">
+    <div class="row rd-bar">
+      <div class="seg" id="tool" role="group" aria-label="Drawing tool">
+        <button aria-pressed="true" data-v="rect" title="Draw boxes (B)">Box</button>
+        <button aria-pressed="false" data-v="free" title="Freehand brush (F)">Freehand</button>
+      </div>
+      <div class="seg" id="style" role="group" aria-label="Cover style">
+        <button aria-pressed="true" data-v="black">Black</button>
+        <button aria-pressed="false" data-v="color">Colour</button>
+        <button aria-pressed="false" data-v="pixelate">Pixelate</button>
+        <button aria-pressed="false" data-v="blur">Blur</button>
+      </div>
+      <label class="rd-color" id="colorWrap" title="Cover colour"><span class="sr">Cover colour</span><input type="color" id="color" value="#ffffff"></label>
+      <label class="field rd-brush" id="brushWrap" hidden><span class="row between"><span>Brush</span><output id="brushV" class="mono">24</output></span>
+        <input type="range" id="brush" min="6" max="80" step="1" value="24"></label>
+      <span class="grow"></span>
+      <button class="btn ghost small icon" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo" disabled><svg class="i"><use href="#i-refresh"/></svg></button>
+      <button class="btn ghost small" id="del" disabled><svg class="i"><use href="#i-x"/></svg>Delete</button>
+      <button class="btn ghost small" id="clearAll" disabled><svg class="i"><use href="#i-trash"/></svg>Clear all</button>
+    </div>
+
+    <p class="rd-warn" id="warn" hidden><b>Heads-up:</b> blur and pixelate over text can sometimes be reversed or guessed, especially for short numbers. For passwords, card numbers and names, use solid <b>Black</b>.</p>
+
+    <div class="rd-stage checker" id="stageWrap">
+      <canvas id="stage" tabindex="0" aria-label="Image editor. Drag to draw a cover; drag a cover to move it; drag its corners to resize. Delete removes the selected cover, arrow keys nudge it."></canvas>
+      <label class="drop rd-drop" id="drop">
+        <input type="file" accept="image/*" hidden>
+        <svg class="i"><use href="#i-image"/></svg>
+        <b>Drop an image or paste a screenshot</b>
+        <span class="faint">PNG, JPG, WebP, GIF · or click to choose</span>
+      </label>
+    </div>
+
+    <div class="row">
+      <span class="faint rd-meta" id="meta">No image yet</span>
+      <span class="grow"></span>
+      <label class="btn ghost small" id="open"><svg class="i"><use href="#i-upload"/></svg>Open<input type="file" accept="image/*" hidden></label>
+      <div class="seg" id="fmt" role="group" aria-label="Export format">
+        <button aria-pressed="true" data-v="png">PNG</button>
+        <button aria-pressed="false" data-v="jpeg">JPG</button>
+      </div>
+      <button class="btn" id="copy" disabled><svg class="i"><use href="#i-copy"/></svg>Copy</button>
+      <button class="btn primary" id="save" disabled><svg class="i"><use href="#i-download"/></svg>Save redacted image</button>
+    </div>
+    <p class="faint rd-note">The export is drawn from scratch at the original resolution with your covers burned in, and re-encoded, so it carries no metadata (no EXIF, no GPS) and no hidden layers.</p>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
